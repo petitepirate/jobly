@@ -18,26 +18,21 @@ class Company {
 
   static async create({ handle, name, description, numEmployees, logoUrl }) {
     const duplicateCheck = await db.query(
-          `SELECT handle
+      `SELECT handle
            FROM companies
            WHERE handle = $1`,
-        [handle]);
+      [handle]
+    );
 
     if (duplicateCheck.rows[0])
       throw new BadRequestError(`Duplicate company: ${handle}`);
 
     const result = await db.query(
-          `INSERT INTO companies
+      `INSERT INTO companies
            (handle, name, description, num_employees, logo_url)
            VALUES ($1, $2, $3, $4, $5)
            RETURNING handle, name, description, num_employees AS "numEmployees", logo_url AS "logoUrl"`,
-        [
-          handle,
-          name,
-          description,
-          numEmployees,
-          logoUrl,
-        ],
+      [handle, name, description, numEmployees, logoUrl]
     );
     const company = result.rows[0];
 
@@ -51,13 +46,14 @@ class Company {
 
   static async findAll() {
     const companiesRes = await db.query(
-          `SELECT handle,
+      `SELECT handle,
                   name,
                   description,
                   num_employees AS "numEmployees",
                   logo_url AS "logoUrl"
            FROM companies
-           ORDER BY name`);
+           ORDER BY name`
+    );
     return companiesRes.rows;
   }
 
@@ -71,20 +67,28 @@ class Company {
 
   static async get(handle) {
     const companyRes = await db.query(
-          `SELECT handle,
+      `SELECT handle,
                   name,
                   description,
                   num_employees AS "numEmployees",
                   logo_url AS "logoUrl"
            FROM companies
            WHERE handle = $1`,
-        [handle]);
+      [handle]
+    );
 
     const company = companyRes.rows[0];
 
     if (!company) throw new NotFoundError(`No company: ${handle}`);
 
     return company;
+  }
+
+  static async getCompanyJobs(handle) {
+    const companyJobs = await db.query(`SELECT * FROM jobs WHERE company_handle = $1`, [handle])
+    
+    return companyJobs.rows
+
   }
 
   /** Update company data with `data`.
@@ -100,12 +104,10 @@ class Company {
    */
 
   static async update(handle, data) {
-    const { setCols, values } = sqlForPartialUpdate(
-        data,
-        {
-          numEmployees: "num_employees",
-          logoUrl: "logo_url",
-        });
+    const { setCols, values } = sqlForPartialUpdate(data, {
+      numEmployees: "num_employees",
+      logoUrl: "logo_url",
+    });
     const handleVarIdx = "$" + (values.length + 1);
 
     const querySql = `UPDATE companies 
@@ -131,16 +133,42 @@ class Company {
 
   static async remove(handle) {
     const result = await db.query(
-          `DELETE
+      `DELETE
            FROM companies
            WHERE handle = $1
            RETURNING handle`,
-        [handle]);
+      [handle]
+    );
     const company = result.rows[0];
 
     if (!company) throw new NotFoundError(`No company: ${handle}`);
   }
-}
 
+  // Automates filtering of companies based on query string
+  static async filterCompanies(urlQuery) {
+    let newQuery = `SELECT * FROM companies WHERE`;
+    // if (name) get companies that match query
+    let queryCount = 0;
+
+    for (let key in urlQuery) {
+      if (queryCount > 0) {
+        newQuery += ` AND `;
+      }
+      if (key === "name") {
+        newQuery += ` LOWER(name) LIKE LOWER('%${urlQuery[key]}%')`;
+      }
+      if (key === "minEmployees") {
+        newQuery += ` num_employees >= ${urlQuery[key]} `;
+      }
+      if (key === "maxEmployees") {
+        newQuery += ` num_employees <= ${urlQuery[key]} `;
+      }
+      queryCount++;
+    }
+
+    const results = await db.query(newQuery);
+    return results.rows;
+  }
+}
 
 module.exports = Company;
