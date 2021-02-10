@@ -87,6 +87,28 @@ describe("findAll", function () {
   });
 });
 
+/***************************************** Filtered Data */
+describe("filterCompanies(urlQuery)", function () {
+  test("works: query filter by name", async function () {
+    let foundCompany = await Company.filterCompanies({name: 'c1'});
+    expect(foundCompany[0].name).toBe('C1')
+    expect(foundCompany.length).toEqual(1)
+  });
+
+  test("works: query filter by minEmployees", async function () {
+    let foundCompany = await Company.filterCompanies({minEmployees: '3'});
+    expect(foundCompany[0].name).toBe('C3')
+    expect(foundCompany.length).toEqual(1)
+  });
+
+  test("works: query filter by maxEmployees", async function () {
+    let foundCompany = await Company.filterCompanies({maxEmployees: '2'});
+    expect(foundCompany[0].name).toBe('C1')
+    expect(foundCompany[1].name).toBe('C2')
+    expect(foundCompany.length).toEqual(2)
+  });
+});
+
 /************************************** get */
 
 describe("get", function () {

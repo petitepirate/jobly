@@ -111,6 +111,7 @@ describe("GET /companies", function () {
     });
   });
 
+
   /************************ Testing GET /companies with query string parameters */
   test("ok for filtered query string w/ SINGLE parameter", async function () {
     const resp = await request(app).get("/companies?name=C1");

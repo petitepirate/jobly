@@ -37,7 +37,7 @@ describe("GET /jobs", function () {
 describe("GET /jobs/:id", function () {
   test("works for anon", async function () {
     const resp = await request(app).get(`/jobs/${jobTest.id}`);
-    expect(resp.body.job.title).toEqual("Salesman or Saleswoman");
+    expect(resp.body.job.title).toEqual("Salesperson");
   });
 
   test("job id not found", async function () {

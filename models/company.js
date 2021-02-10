@@ -84,11 +84,14 @@ class Company {
     return company;
   }
 
+  /*
+  Given a company handle, get the jobs of that company
+  Returns company object & jobs array
+  */
   static async getCompanyJobs(handle) {
     const companyJobs = await db.query(`SELECT * FROM jobs WHERE company_handle = $1`, [handle])
     
     return companyJobs.rows
-
   }
 
   /** Update company data with `data`.
@@ -144,7 +147,11 @@ class Company {
     if (!company) throw new NotFoundError(`No company: ${handle}`);
   }
 
-  // Automates filtering of companies based on query string
+  /*
+   Automates filtering of companies based on query string with name, minEmployee #, or maxEmployee #
+   example http://localhost:3001/companies/?name=arn returns 2 companies:
+   arnold-berger-townsend & garner-michael
+   */
   static async filterCompanies(urlQuery) {
     let newQuery = `SELECT * FROM companies WHERE`;
     // if (name) get companies that match query

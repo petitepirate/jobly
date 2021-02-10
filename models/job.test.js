@@ -29,7 +29,7 @@ let newJob2 = {
   company_handle: "c2",
 };
 
-/********************* create */
+/*************************************** create */
 
 describe("create", function () {
   test("works", async function () {
@@ -124,12 +124,6 @@ describe("get(id)", function () {
 /************************************** filterJobs(urlQuery) */
 
 describe("filterJobs(urlQuery)", function () {
-  const filterData = {
-    minSalary: "50000",
-    title: "sales",
-    hasEquity: "t",
-    type: "admin",
-  };
 
   test("successfully finds job w/ single query", async function () {
     await Job.create(newJob);

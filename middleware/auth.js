@@ -29,9 +29,9 @@ function authenticateJWT(req, res, next) {
 }
 
 /** Middleware to use when they must be logged in.
- *
- * If not, raises Unauthorized.
- */
+*
+* If not, raises Unauthorized.
+*/
 
 function ensureLoggedIn(req, res, next) {
   try {
@@ -42,8 +42,39 @@ function ensureLoggedIn(req, res, next) {
   }
 }
 
+/*
+Middleware function to check that the use is loged in an admin
+*/
+
+function ensureAdmin(req, res, next) {
+  try {
+    if (!res.locals.user || !res.locals.user.isAdmin) {
+      throw new UnauthorizedError();
+    }
+    return next()
+  } catch (err) {
+    return next(err)
+  }
+}
+
+/*
+Middleware function to check that the correct user is accessing the route (token based)
+*/
+function ensureCorrectUser(req, res, next) {
+  try {
+    const user = res.locals.user;
+    if (!(user && (user.isAdmin || user.username === req.params.username))) {
+      throw new UnauthorizedError();
+    }
+    return next();
+  } catch (err) {
+    return next(err);
+  }
+}
 
 module.exports = {
   authenticateJWT,
   ensureLoggedIn,
+  ensureAdmin,
+  ensureCorrectUser
 };

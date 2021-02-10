@@ -11,16 +11,14 @@ const jobUpdateSchema = require("../schemas/jobUpdate.json");
 
 const router = new express.Router();
 
-/** GET /  =>
- *   { jobs: [ { id, title, salar, equity, company_handle }, ...] }
- *
- * Can filter on provided search filters:
- * - title (will find case-insensitive, partial matches)
- * - minSalary
- * - hasEquity (boolean)
- *
- * Authorization required: none
- * Example: http://localhost:3001/jobs?minSalary=50000&title=sales&hasEquity=true
+/* 
+GET / 
+   Can filter on provided search filters:
+  - title (will find case-insensitive, partial matches)
+  - minSalary
+  - hasEquity (boolean)
+  Authorization required: none
+  Example: http://localhost:3001/jobs?minSalary=50000&title=sales&hasEquity=true
  */
 
 router.get("/", async function (req, res, next) {
@@ -43,16 +41,15 @@ router.get("/", async function (req, res, next) {
       jobs = await Job.findAll();
     }
     
-
     return res.json({ jobs });
   } catch (err) {
     return next(err);
   }
 });
 
-/** Get job based on id => Returns all data
- *
- * Authorization:
+/*
+Get job based on id => Returns all data
+Authorization: None
  */
 
 router.get("/:id", async function (req, res, next) {
@@ -64,13 +61,11 @@ router.get("/:id", async function (req, res, next) {
   }
 });
 
-/** Post {job} => {job} 
- * 
- * json.body should contain { title, salary, equity, company_handle } 
- *
- * Returns { id, title, salary, equity, companyHandle }
- * 
- * Authorization:
+/* 
+Posts a job
+json.body should contain { title, salary, equity, company_handle } 
+Returns { id, title, salary, equity, companyHandle }
+Authorization: Admin
  */
 
 router.post("/", ensureAdmin, async function (req, res, next) {
@@ -89,15 +84,9 @@ router.post("/", ensureAdmin, async function (req, res, next) {
     }
 });
 
-/** Patch /:id { fld1, fld2, ... } => {job} 
- * 
- * Patches job data
- * 
- * json.body can contain: { title, salary, equity } 
- *
- * Returns { id, title, salary, equity, companyHandle }
- * 
- * Authorization:
+/* 
+Patch route to edit job
+ Authorization: Admin
  */
 
 router.patch("/:id", ensureAdmin, async function (req, res, next) {
@@ -115,10 +104,10 @@ router.patch("/:id", ensureAdmin, async function (req, res, next) {
     }
 });
 
-/** DELETE job based on id => { deleted: handle }
- *
- * Authorization:
- */
+/*
+DELETE job using job_id
+Authorization: Admin
+*/
 
 router.delete("/:id", ensureAdmin, async function (req, res, next) {
   try {

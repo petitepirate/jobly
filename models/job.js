@@ -1,13 +1,14 @@
 "use strict";
 
 const db = require("../db");
-const { BadRequestError, NotFoundError } = require("../expressError");
+const { NotFoundError } = require("../expressError");
 const { sqlForPartialUpdate } = require("../helpers/sql");
 
 class Job {
-  /** Create new job posting
-   * Returns [{ id, title, salary, equity, companyHandle }]
-   */
+  /* 
+  Create new job posting
+  Returns [{ id, title, salary, equity, companyHandle }]
+  */
   static async create({ title, salary, equity, company_handle }) {
     const { rows } = await db.query(
       `INSERT INTO jobs
@@ -21,26 +22,18 @@ class Job {
     return job;
   }
 
-  /** Find all jobs.
-   *
-   * Returns [{ id, title, salary, equity, companyHandle }, ...]
-   * */
+  /* 
+  Find all jobs.
+  Returns [{ id, title, salary, equity, companyHandle }, ...]
+  */
   static async findAll() {
     const { rows } = await db.query(`SELECT * FROM jobs`);
     return rows;
   }
 
-  /** Update job data with `data`.
-   *
-   * This is a "partial update" --- it's fine if data doesn't contain all the
-   * fields; this only changes provided ones.
-   *
-   * Data can include: {title, salary, equity}
-   *
-   * Returns {id, title, salary, equity, companyHandle}
-   *
-   * Throws NotFoundError if not found.
-   */
+  /* 
+  Update job data - allows for partial update
+  */
 
   static async update(id, data) {
     const { setCols, values } = sqlForPartialUpdate(data, {
@@ -62,10 +55,10 @@ class Job {
     return job;
   }
 
-  /** Delete given job from database based on id; returns undefined.
-   *
-   * Throws NotFoundError if company not found.
-   **/
+  /* 
+  Delete given job from database based on id; returns undefined.
+  Throws NotFoundError if company not found.
+  */
 
   static async remove(id) {
     const {rows} = await db.query(`DELETE FROM jobs WHERE id = $1 RETURNING id`, [id]);
@@ -74,10 +67,10 @@ class Job {
     if (!job) throw new NotFoundError(`No job found with id: ${id}`);
   }
 
-  /** Get a job from database based on id; returns *.
-   *
-   * Throws NotFoundError if company not found.
-   **/
+  /* 
+  Get a job from database based on id; returns *.
+  Throws NotFoundError if company not found.
+  */
 
   static async get(id) {
     const { rows } = await db.query(
@@ -94,10 +87,11 @@ class Job {
     return job;
   }
 
-// TODO:
-/**Automates filtering of companies based on query string 
- * Valid query strings = minSalary, title, hasEquity
- */   
+
+/*
+Automates filtering of companies based on query string 
+Valid query strings = minSalary, title, hasEquity
+*/   
   static async filterJobs(urlQuery) {
       let newQuery = `SELECT * FROM jobs WHERE`;
       let queryCount = 0;

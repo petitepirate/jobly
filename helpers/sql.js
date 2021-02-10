@@ -4,7 +4,8 @@ const { BadRequestError } = require("../expressError");
 
 /*
 to be used in models
-dataToUpdate = updated information pulled from req.body for patch requests. 
+dataToUpdate = updated information pulled from req.body for patch requests.
+jsToSql = maps js object into database column names 
 Function transforms data to allow it to safely run via SQL
 Returns data to use for UPDATE table_name SET (data), [$1, $2, etc.] 
 */
