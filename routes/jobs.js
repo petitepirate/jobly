@@ -35,7 +35,6 @@ router.get("/", async function (req, res, next) {
     }
     
     if(urlQuery.title || urlQuery.minSalary || urlQuery.hasEquity) {
-      delete urlQuery.type;
       jobs = await Job.filterJobs(urlQuery)
     } else {
       jobs = await Job.findAll();

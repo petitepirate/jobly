@@ -54,9 +54,8 @@ router.get("/", async function (req, res, next) {
   try {
     let companies;
     const urlQuery = req.query;
-    
+    console.log(urlQuery)  
     if(urlQuery.name || urlQuery.minEmployees || urlQuery.maxEmployees) {
-      delete urlQuery.type;
       companies = await Company.filterCompanies(urlQuery)
     } else {
       companies = await Company.findAll();
