@@ -5,7 +5,7 @@
 const jsonschema = require("jsonschema");
 const express = require("express");
 
-const { BadRequestError } = require("../expressError");
+const { BadRequestError, ExpressError } = require("../expressError");
 const { ensureAdmin } = require("../middleware/auth");
 const Company = require("../models/company");
 
@@ -54,10 +54,13 @@ router.get("/", async function (req, res, next) {
   try {
     let companies;
     const urlQuery = req.query;
-    console.log(urlQuery)  
     if(urlQuery.name || urlQuery.minEmployees || urlQuery.maxEmployees) {
-      companies = await Company.filterCompanies(urlQuery)
-    } else {
+      if(Number(urlQuery.minEmployees) > Number(urlQuery.maxEmployees)) { //check if min is higher than max
+        throw new ExpressError(`Invalid query: minimum Employees is higher than maximum Employees`, 400)
+      } else {  // else return the filtered companies
+        companies = await Company.filterCompanies(urlQuery)
+      }
+    } else {  // return all companies
       companies = await Company.findAll();
     }
     
