@@ -12,6 +12,12 @@ VALUES ('testuser',
         'Test',
         'Admin!',
         'joel@joelburton.com',
+        TRUE),
+        ('petitepirate',
+        '369842Mny!',
+        'Tesasdft',
+        'Admiasdfadn!',
+        'joeasdfadsfadsl@joelburton.com',
         TRUE);
 
 INSERT INTO companies (handle,
